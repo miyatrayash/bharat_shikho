@@ -1,9 +1,8 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bharat_shikho/audio_player.dart';
+import 'package:bharat_shikho/media_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 class PodcastCard extends StatelessWidget {
   final QueryDocumentSnapshot? snapshot;
   const PodcastCard({Key? key, this.snapshot}) : super(key: key);
@@ -17,9 +16,10 @@ class PodcastCard extends StatelessWidget {
             title: snapshot!.get('title'),
             id: snapshot!.get('id'),
             album: snapshot!.get('album'),
-            artUri:  Uri.parse(snapshot!.get('artUri')),
+            artUri: Uri.parse(snapshot!.get('artUri')),
             artist: snapshot!.get('artist'),
-            duration: Duration(milliseconds: int.parse(snapshot!.get('duration'))),
+            duration:
+                Duration(milliseconds: int.parse(snapshot!.get('duration'))),
           );
           return MediaPlayer(item: mediaItem);
         }));
@@ -49,7 +49,7 @@ class PodcastCard extends StatelessWidget {
                           ),
                           Container(
                             padding: const EdgeInsets.all(8.0),
-                            width: MediaQuery.of(context).size.width -200,
+                            width: MediaQuery.of(context).size.width - 200,
                             child: AutoSizeText(
                               snapshot!.get('title'),
                               style: TextStyle(
@@ -91,11 +91,8 @@ class PodcastCard extends StatelessWidget {
                           Padding(
                             padding: EdgeInsets.only(left: 3),
                           ),
-                          AutoSizeText('${Duration(
-                                  milliseconds:
-                                      int.parse(snapshot!.get('duration')))
-                              .inMinutes
-                              .toString()} min'),
+                          AutoSizeText(
+                              '${Duration(milliseconds: int.parse(snapshot!.get('duration'))).inMinutes.toString()} min'),
                         ],
                       ),
                     ),

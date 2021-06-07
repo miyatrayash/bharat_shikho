@@ -42,10 +42,12 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    Brightness brightness = Theme.of(context).brightness;
+
     return Scaffold(
-      // backgroundColor: Colors.grey[900],
       appBar: AppBar(
-        backgroundColor: Colors.grey[900],
+        backgroundColor:
+            brightness == Brightness.light ? Colors.white : Colors.black,
         elevation: 5,
         bottom: TabBar(
           controller: _tabController,
@@ -57,12 +59,14 @@ class _HomeScreenState extends State<HomeScreen>
         ),
         title: Text(
           "Home",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+              color:
+                  brightness == Brightness.light ? Colors.black : Colors.white),
         ),
         backwardsCompatibility: false,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Colors.white,
+          icon: Icon(Icons.arrow_back_ios_new_rounded),
+          color: brightness == Brightness.light ? Colors.black : Colors.white,
           onPressed: () async {
             await (await UserRepository.instance()).signOut();
           },
@@ -76,22 +80,22 @@ class _HomeScreenState extends State<HomeScreen>
         SingleChildScrollView(
           child: FutureBuilder<QuerySnapshot>(
             future: AudioService.newsPodcasts,
-            builder: (BuildContext context,  snapshot) {
-                 if(snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData)
-                   {
-                     return Center(
-                       child: CircularProgressIndicator(),
-                     );
-                   }
-                 return Container(
-                   height: MediaQuery.of(context).size.height - 100,
-                   child: ListView.builder(
-                     itemBuilder: (context, index){
-                       return PodcastCard(snapshot: snapshot.data!.docs[index]);
-                     },
-                     itemCount: snapshot.data!.docs.length,
-                   ),
-                 );
+            builder: (BuildContext context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  !snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              return Container(
+                height: MediaQuery.of(context).size.height - 100,
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    return PodcastCard(snapshot: snapshot.data!.docs[index]);
+                  },
+                  itemCount: snapshot.data!.docs.length,
+                ),
+              );
             },
           ),
         ),
@@ -108,10 +112,13 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget buildBottomNavigationBar() {
+    Brightness brightness = Theme.of(context).brightness;
     return BottomNavigationBar(
-        backgroundColor: Colors.grey[850],
+        backgroundColor:
+            brightness == Brightness.light ? Colors.white : Colors.black,
         currentIndex: _selectedIndex,
-        fixedColor: Colors.white,
+        fixedColor:
+            brightness == Brightness.light ? Colors.black : Colors.white,
         onTap: _onTap,
         items: [
           BottomNavigationBarItem(
