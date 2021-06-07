@@ -1,6 +1,6 @@
 import 'package:bharat_shikho/screens/Home/home_screen.dart';
-import 'package:bharat_shikho/screens/Welcome/welcome_screen.dart';
-import 'package:bharat_shikho/screens/signin_screen.dart';
+import 'package:bharat_shikho/screens/Login/login_screen.dart';
+// import 'package:bharat_shikho/screens/signin_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +20,7 @@ class _WrapperState extends State<Wrapper> {
     User? user = Provider.of<User?>(context);
 
     if(user == null)
-      return SignInScreen();
+      return LoginScreen();
 
     return HomeScreen();
   }
