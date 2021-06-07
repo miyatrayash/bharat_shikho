@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "211378771294-f68k9v4r7mcjidgs5fnqj6rm2b8i2h7m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bharat_shikho",
+            "certificate_hash": "8d8fab2112bb69e93576f27f31d942e5047ce734"
+          }
+        },
+        {
           "client_id": "211378771294-s46lskc7ogrcln16pv0ok9hbn15kghk1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

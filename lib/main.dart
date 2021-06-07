@@ -1,5 +1,6 @@
 import 'package:bharat_shikho/Theme/app_theme.dart';
 import 'package:bharat_shikho/screens/Login/login_screen.dart';
+import 'package:bharat_shikho/screens/wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _MyAppState extends State<MyApp> {
         theme: AppTheme.light,
         // theme: AppTheme.dark,
         darkTheme: AppTheme.dark,
-        home: LoginScreen(),
+        home: Wrapper(),
       ),
     );
   }

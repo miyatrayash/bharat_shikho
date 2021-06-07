@@ -5,17 +5,13 @@ import 'package:bharat_shikho/audio/audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-
 void _audioTaskEntryPoint() async {
   print("here");
 
   await AudioServiceBackground.run(() => AudioPlayerTask());
 }
 
-
-
 class MediaPlayer extends StatefulWidget {
-
   final MediaItem item;
 
   MediaPlayer({required this.item});
@@ -25,20 +21,18 @@ class MediaPlayer extends StatefulWidget {
 }
 
 class _MediaPlayerState extends State<MediaPlayer> {
-
   double screenWidth = 0;
   double screenHeight = 0;
 
-
   init() async {
-
     List<dynamic> list = [];
 
-      var m = widget.item.toJson();
-      list.add(m);
+    var m = widget.item.toJson();
+    list.add(m);
 
-    var params = {"data" : list};
-    if(AudioService.connected && AudioService.currentMediaItem != widget.item) {
+    var params = {"data": list};
+    if (AudioService.connected &&
+        AudioService.currentMediaItem != widget.item) {
       await AudioService.stop();
       await AudioService.disconnect();
     }
@@ -58,7 +52,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
   }
 
   final BehaviorSubject<double?> _dragPositionSubject =
-  BehaviorSubject.seeded(null);
+      BehaviorSubject.seeded(null);
 
   Widget audioImage(MediaItem item) {
     return Container(
@@ -68,10 +62,9 @@ class _MediaPlayerState extends State<MediaPlayer> {
         elevation: 18.0,
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(50),
-        child: ClipRRect(borderRadius: BorderRadius.circular(30),
-          child: Image.network(
-              item.artUri.toString(),
-              fit: BoxFit.fill),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: Image.network(item.artUri.toString(), fit: BoxFit.fill),
         ),
       ),
     );
@@ -82,23 +75,27 @@ class _MediaPlayerState extends State<MediaPlayer> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
-          child: Text(item.title,
+          child: Text(
+            item.title,
             style: TextStyle(
                 fontSize: 30, color: Colors.black, fontWeight: FontWeight.w800),
-          ),),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
           child: Icon(Icons.favorite, color: Colors.red),
         ),
-
       ],
     );
   }
 
   Widget artistText(MediaItem item) {
-    return Align(alignment: Alignment.centerLeft,
-      child: Text(item.artist!,
-        style: TextStyle(color: Colors.redAccent),),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        item.artist!,
+        style: TextStyle(color: Colors.redAccent),
+      ),
     );
   }
 
@@ -108,10 +105,10 @@ class _MediaPlayerState extends State<MediaPlayer> {
       stream: Rx.combineLatest2<double?, double?, double?>(
           _dragPositionSubject.stream,
           Stream.periodic(Duration(milliseconds: 200)),
-              (dragPosition, _) => dragPosition),
+          (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
-        double position =
-            snapshot.data as double? ?? state.currentPosition.inMilliseconds.toDouble();
+        double position = snapshot.data as double? ??
+            state.currentPosition.inMilliseconds.toDouble();
         double? duration = item.duration?.inMilliseconds.toDouble();
         return Column(
           children: [
@@ -161,15 +158,13 @@ class _MediaPlayerState extends State<MediaPlayer> {
     );
   }
 
-
   Widget playBar(PlaybackState state) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-
         IconButton(
           icon: Icon(Icons.fast_rewind_rounded),
-          onPressed:AudioService.rewind,
+          onPressed: AudioService.rewind,
           iconSize: screenHeight * 0.05,
           color: Colors.black,
           splashColor: Colors.transparent,
@@ -197,69 +192,59 @@ class _MediaPlayerState extends State<MediaPlayer> {
     );
   }
 
-  Future waitTillNotNull()  async {
-
-  }
+  Future waitTillNotNull() async {}
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
-    return Scaffold(backgroundColor: Colors.white,
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      backgroundColor: Colors.white,
       body: StreamBuilder<AudioState>(
           stream: _audioStateStream,
-          builder:(context,snapshot) {
+          builder: (context, snapshot) {
+            final audioState = snapshot.data;
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                !snapshot.hasData) {
+              return CircularProgressIndicator();
+            }
+            final mediaItem = audioState?.mediaItem;
+            final playbackState = audioState?.playbackState;
+            if (mediaItem == null) {
+              return Center(child: CircularProgressIndicator());
+            }
+            final processingState =
+                playbackState?.processingState ?? AudioProcessingState.none;
+            print(processingState);
 
-                final audioState = snapshot.data;
-                if (snapshot.connectionState == ConnectionState.waiting ||
-                    !snapshot.hasData ) {
-                  return CircularProgressIndicator();
-                }
-                final mediaItem = audioState?.mediaItem;
-                final playbackState = audioState?.playbackState;
-                if(mediaItem == null)
-                  {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                final processingState =
-                    playbackState?.processingState ?? AudioProcessingState.none;
-                print(processingState);
-
-                return Stack(
-                  children: [
-                    Container(
-                      width: screenWidth * 0.8, height: screenHeight * 0.4,
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.black87, Colors.black12]
-                          )
-                      ),
-                    ),
-                    Padding(padding: EdgeInsets.only(
-                        left: screenWidth * 0.1, right: screenWidth * 0.1),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          audioImage(mediaItem),
-                          titleBar(mediaItem),
-                          artistText(mediaItem),
-                          slider(mediaItem, playbackState!),
-                          playBar(playbackState),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }
-          ),
-      );
+            return Stack(
+              children: [
+                Container(
+                  width: screenWidth * 0.8,
+                  height: screenHeight * 0.4,
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.black87, Colors.black12])),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: screenWidth * 0.1, right: screenWidth * 0.1),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      audioImage(mediaItem),
+                      titleBar(mediaItem),
+                      artistText(mediaItem),
+                      slider(mediaItem, playbackState!),
+                      playBar(playbackState),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+    );
   }
 }
 
@@ -280,14 +265,14 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }
- /// Transforms string into a mm:ss format
-String transformString(int seconds) {
-    String minuteString =
-        '${(seconds / 60).floor() < 10 ? 0 : ''}${(seconds / 60).floor()}';
-    String secondString = '${seconds % 60 < 10 ? 0 : ''}${seconds % 60}';
-    return '$minuteString:$secondString'; // Returns a string with the format mm:ss
-  }
 
+/// Transforms string into a mm:ss format
+String transformString(int seconds) {
+  String minuteString =
+      '${(seconds / 60).floor() < 10 ? 0 : ''}${(seconds / 60).floor()}';
+  String secondString = '${seconds % 60 < 10 ? 0 : ''}${seconds % 60}';
+  return '$minuteString:$secondString'; // Returns a string with the format mm:ss
+}
 
 Stream<AudioState> get _audioStateStream {
   return Rx.combineLatest3<List<MediaItem>?, MediaItem?, PlaybackState,
@@ -295,7 +280,7 @@ Stream<AudioState> get _audioStateStream {
     AudioService.queueStream,
     AudioService.currentMediaItemStream,
     AudioService.playbackStateStream,
-        (queue, mediaItem, playbackState) =>
-        AudioState(queue: queue, mediaItem: mediaItem,playbackState: playbackState),
+    (queue, mediaItem, playbackState) => AudioState(
+        queue: queue, mediaItem: mediaItem, playbackState: playbackState),
   );
 }

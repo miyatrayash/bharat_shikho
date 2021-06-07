@@ -1,9 +1,8 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bharat_shikho/audio_player.dart';
+import 'package:bharat_shikho/media_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 class PodcastCard extends StatelessWidget {
   final QueryDocumentSnapshot? snapshot;
   const PodcastCard({Key? key, this.snapshot}) : super(key: key);
