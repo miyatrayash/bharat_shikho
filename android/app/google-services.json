@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "211378771294",
+    "project_id": "bharat-shikho",
+    "storage_bucket": "bharat-shikho.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:211378771294:android:3f2c385a51f49fea95ebcf",
+        "android_client_info": {
+          "package_name": "com.example.bharat_shikho"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "211378771294-s46lskc7ogrcln16pv0ok9hbn15kghk1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bharat_shikho",
+            "certificate_hash": "f9e4815e92cfae8eb2d209d9a3449d79a72e4eda"
+          }
+        },
+        {
+          "client_id": "211378771294-np5g6q9bghgbbpem9d76m1c55o6t4qjg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH3PidfNGj8yfRd32cHuCLlBkuU2vJ3hA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "211378771294-np5g6q9bghgbbpem9d76m1c55o6t4qjg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
