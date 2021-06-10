@@ -1,15 +1,11 @@
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:bharat_shikho/audio/audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-
-void _audioTaskEntryPoint() async {
-  print("here");
-
-  await AudioServiceBackground.run(() => AudioPlayerTask());
-}
+import 'package:bharat_shikho/user_repository.dart';
 
 class MediaPlayer extends StatefulWidget {
   final MediaItem item;
@@ -38,7 +34,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
     }
     await AudioService.connect();
     await AudioService.start(
-      backgroundTaskEntrypoint: _audioTaskEntryPoint,
+      backgroundTaskEntrypoint: audioTaskEntryPoint,
       androidNotificationChannelName: 'Audio Service Demo',
       androidNotificationColor: 0xFF2222f5,
       params: params,
@@ -71,30 +67,42 @@ class _MediaPlayerState extends State<MediaPlayer> {
   }
 
   Widget titleBar(MediaItem item) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Flexible(
-          child: Text(
-            item.title,
-            style: TextStyle(
-                fontSize: 30, color: Colors.black, fontWeight: FontWeight.w800),
-          ),
+    return Container(
+      height: screenHeight * 0.15,
+      child: SingleChildScrollView(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                item.title,
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w800),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
+              child: Icon(Icons.favorite, color: Colors.red),
+            ),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
-          child: Icon(Icons.favorite, color: Colors.red),
-        ),
-      ],
+      ),
     );
   }
 
   Widget artistText(MediaItem item) {
     return Align(
       alignment: Alignment.centerLeft,
-      child: Text(
-        item.artist!,
-        style: TextStyle(color: Colors.redAccent),
+      child: Container(
+        height: screenHeight * 0.05,
+        child: SingleChildScrollView(
+          child: AutoSizeText(
+            item.artist!,
+            style: TextStyle(color: Colors.redAccent, fontSize: 20),
+          ),
+        ),
       ),
     );
   }
@@ -192,58 +200,53 @@ class _MediaPlayerState extends State<MediaPlayer> {
     );
   }
 
-  Future waitTillNotNull() async {}
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.deepOrange,
+      ),
       backgroundColor: Colors.white,
-      body: StreamBuilder<AudioState>(
-          stream: _audioStateStream,
-          builder: (context, snapshot) {
-            final audioState = snapshot.data;
-            if (snapshot.connectionState == ConnectionState.waiting ||
-                !snapshot.hasData) {
-              return CircularProgressIndicator();
-            }
-            final mediaItem = audioState?.mediaItem;
-            final playbackState = audioState?.playbackState;
-            if (mediaItem == null) {
-              return Center(child: CircularProgressIndicator());
-            }
-            final processingState =
-                playbackState?.processingState ?? AudioProcessingState.none;
-            print(processingState);
+      body: SingleChildScrollView(
+        child: StreamBuilder<AudioState>(
+            stream: audioStateStream,
+            builder: (context, snapshot) {
+              final audioState = snapshot.data;
+              print(snapshot.connectionState);
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  !snapshot.hasData) {
+                return CircularProgressIndicator();
+              }
+              final mediaItem = audioState?.mediaItem;
+              final playbackState = audioState?.playbackState;
+              if (mediaItem == null) {
+                return Center(child: CircularProgressIndicator());
+              }
+              final processingState =
+                  playbackState?.processingState ?? AudioProcessingState.none;
+              print(processingState);
 
-            return Stack(
-              children: [
-                Container(
-                  width: screenWidth * 0.8,
-                  height: screenHeight * 0.4,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Colors.black87, Colors.black12])),
+              return Container(
+                height: screenHeight - 100,
+                width: screenWidth,
+                padding: EdgeInsets.only(
+                    left: screenWidth * 0.1, right: screenWidth * 0.1),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SizedBox(),
+                    audioImage(mediaItem),
+                    titleBar(mediaItem),
+                    artistText(mediaItem),
+                    slider(mediaItem, playbackState!),  
+                    playBar(playbackState),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsets.only(
-                      left: screenWidth * 0.1, right: screenWidth * 0.1),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      audioImage(mediaItem),
-                      titleBar(mediaItem),
-                      artistText(mediaItem),
-                      slider(mediaItem, playbackState!),
-                      playBar(playbackState),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+              );
+            }),
+      ),
     );
   }
 }
@@ -264,23 +267,4 @@ class CustomTrackShape extends RoundedRectSliderTrackShape {
     final double trackWidth = parentBox.size.width;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
-}
-
-/// Transforms string into a mm:ss format
-String transformString(int seconds) {
-  String minuteString =
-      '${(seconds / 60).floor() < 10 ? 0 : ''}${(seconds / 60).floor()}';
-  String secondString = '${seconds % 60 < 10 ? 0 : ''}${seconds % 60}';
-  return '$minuteString:$secondString'; // Returns a string with the format mm:ss
-}
-
-Stream<AudioState> get _audioStateStream {
-  return Rx.combineLatest3<List<MediaItem>?, MediaItem?, PlaybackState,
-      AudioState>(
-    AudioService.queueStream,
-    AudioService.currentMediaItemStream,
-    AudioService.playbackStateStream,
-    (queue, mediaItem, playbackState) => AudioState(
-        queue: queue, mediaItem: mediaItem, playbackState: playbackState),
-  );
 }

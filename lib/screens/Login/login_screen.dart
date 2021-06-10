@@ -1,4 +1,5 @@
-import 'package:bharat_shikho/SignIn/signin_screen.dart';
+import 'package:bharat_shikho/screens/Login/SignIn/signup_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:bharat_shikho/screens/Home/home_screen.dart';
@@ -149,38 +150,27 @@ class _LoginScreenState extends State<LoginScreen> {
               Column(
                 children: [
                   // ignore: deprecated_member_use
-                  RaisedButton(
-                    color: Colors.blueGrey,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(),
-                        ),
-                      );
-                    },
-                    elevation: 0,
-                    padding: EdgeInsets.all(18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.blueGrey),
+                      elevation: MaterialStateProperty.all(0),
+                      padding: MaterialStateProperty.all(EdgeInsets.all(18)),
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),),
                     ),
-                    child: Center(
-                      child: TextButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            final userRep = await UserRepository.instance();
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        final userRep = await UserRepository.instance();
 
-                            await userRep.signInWithEmail(
-                                emailController.text, passwordController.text);
-                          }
-                        },
-                        child: Text(
-                          "Login",
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(color: Colors.white),
-                        ),
+                        await userRep.signInWithEmail(
+                            emailController.text, passwordController.text);
+                      }
+                    },
+                    child: Center(
+                      child: Text(
+                        "Login",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -197,11 +187,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignInScreen(),
+                                builder: (context) => SignUpScreen(),
                               ),
                             );
                           },
-                          child: Text("Sign in"),
+                          child: Text("Sign up"),
                         )
                       ],
                     ),

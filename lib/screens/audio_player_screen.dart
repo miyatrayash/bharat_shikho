@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:bharat_shikho/audio/audio_player.dart';
-import 'package:bharat_shikho/media_player.dart';
+import 'package:bharat_shikho/audio/media_player.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 

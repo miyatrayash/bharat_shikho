@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:bharat_shikho/media_player.dart';
+import 'package:bharat_shikho/audio/media_player.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class PodcastCard extends StatelessWidget {
@@ -26,6 +26,9 @@ class PodcastCard extends StatelessWidget {
       },
       child: Container(
         height: 250,
+        decoration: BoxDecoration(
+          
+        ),
         child: Card(
           margin: EdgeInsets.all(15),
           child: Container(

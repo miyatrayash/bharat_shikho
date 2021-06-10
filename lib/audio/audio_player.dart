@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:bharat_shikho/user_repository.dart';
 import 'package:just_audio/just_audio.dart';
 
 MediaControl playControl = MediaControl(
@@ -33,7 +34,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
   List<MediaItem> _queue = [];
 
   int _queueIndex = -1;
-  AudioPlayer _audioPlayer = AudioPlayer();
   AudioProcessingState? _audioProcessingState;
   bool? _playing;
 
@@ -54,13 +54,13 @@ class AudioPlayerTask extends BackgroundAudioTask {
       MediaItem mediaItem = MediaItem.fromJson(mediaItems[i]);
       _queue.add(mediaItem);
     }
-    _playerStateSubscription = _audioPlayer.playerStateStream
+    _playerStateSubscription = audioPlayer.playerStateStream
         .where((state) => state.processingState == ProcessingState.completed)
         .listen((state) {
       _handlePlaybackCompleted();
     });
 
-    _eventSubscription = _audioPlayer.playbackEventStream.listen((event) {
+    _eventSubscription = audioPlayer.playbackEventStream.listen((event) {
       switch (event.processingState) {
         case ProcessingState.idle:
           break;
@@ -90,14 +90,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> onPlay() async {
     if (_audioProcessingState == null) {
       _playing = true;
-      _audioPlayer.play();
+      audioPlayer.play();
     }
   }
 
   @override
   Future<void> onPause() async {
     _playing = false;
-    _audioPlayer.pause();
+    audioPlayer.pause();
   }
 
   @override
@@ -118,7 +118,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onSkipToQueueItem(String mediaId) async {
-    _audioPlayer.setUrl(mediaId);
+    audioPlayer.setUrl(mediaId);
     onPlay();
   }
 
@@ -131,14 +131,14 @@ class AudioPlayerTask extends BackgroundAudioTask {
     if (null == _playing) {
       _playing = true;
     } else if (_playing!) {
-      await _audioPlayer.stop();
+      await audioPlayer.stop();
     }
     _queueIndex = newPos;
     _audioProcessingState = offset > 0
         ? AudioProcessingState.skippingToNext
         : AudioProcessingState.skippingToPrevious;
     await AudioServiceBackground.setMediaItem(mediaItem);
-    await _audioPlayer.setUrl(mediaItem.id);
+    await audioPlayer.setUrl(mediaItem.id);
     print(mediaItem.id);
     _audioProcessingState = null;
     if (_playing!) {
@@ -151,8 +151,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStop() async {
     _playing = false;
-    await _audioPlayer.stop();
-    await _audioPlayer.dispose();
+    await audioPlayer.stop();
+    await audioPlayer.dispose();
     _playerStateSubscription!.cancel();
     _eventSubscription!.cancel();
     return super.onStop();
@@ -160,7 +160,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onSeekTo(Duration position) async {
-    _audioPlayer.seek(position);
+    audioPlayer.seek(position);
   }
 
   @override
@@ -181,9 +181,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
   Future<void> _seekRelative(Duration offset,{bool isRewind = false}) async {
     var newPosition;
     if(isRewind)
-      newPosition = _audioPlayer.position - offset;
+      newPosition = audioPlayer.position - offset;
     else
-      newPosition = _audioPlayer.position + offset;
+      newPosition = audioPlayer.position + offset;
 
     if (newPosition < Duration.zero) {
       newPosition = Duration.zero;
@@ -192,9 +192,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
       newPosition = mediaItem.duration!;
     }
     if(isRewind)
-      await _audioPlayer.seek(_audioPlayer.position - offset);
+      await audioPlayer.seek(audioPlayer.position - offset);
     else
-      await _audioPlayer.seek(_audioPlayer.position + offset);
+      await audioPlayer.seek(audioPlayer.position + offset);
   }
 
   void playPause() {
@@ -219,7 +219,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
   }) async {
     print('SetState $processingState');
     if (position == null) {
-      position = _audioPlayer.position;
+      position = audioPlayer.position;
     }
     await AudioServiceBackground.setState(
       controls: getControls(),
@@ -229,7 +229,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       playing: _playing,
       position: position,
       bufferedPosition: bufferedPosition ?? position,
-      speed: _audioPlayer.speed,
+      speed: audioPlayer.speed,
     );
   }
 
